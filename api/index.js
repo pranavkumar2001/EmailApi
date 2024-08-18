@@ -3,11 +3,16 @@ const fs = require('fs');
 const serverless = require('serverless-http');
 
 const app = express();
+const router = express.Router();  // Define the router
 const port = process.env.PORT || 3000;
 const filePath = './emails.json';
 
 // Middleware to parse JSON bodies
 app.use(express.json());
+
+app.listen(port, () => {
+    console.log(`API running on http://localhost:${port}`);
+});
 
 // Helper function to read data from the file
 function readData() {
@@ -83,6 +88,9 @@ app.delete('/api/emails/remove', (req, res) => {
     res.json({ message: 'Email removed successfully', email });
 });
 
+app.use('/api', router);
+
 // Export the app as a serverless function
 module.exports = app;
 module.exports.handler = serverless(app);
+// module.exports.handler = app.listen()
