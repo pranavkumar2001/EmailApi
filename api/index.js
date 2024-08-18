@@ -1,6 +1,6 @@
-require('dotenv').config();
 const express = require('express');
 const fs = require('fs');
+const serverless = require('serverless-http');
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -28,7 +28,7 @@ function writeData(data) {
     fs.writeFileSync(filePath, JSON.stringify(data, null, 2));
 }
 
-// 1. Add a new email ID
+// API routes
 app.post('/api/emails/add', (req, res) => {
     const emails = readData();
     const { email } = req.body;
@@ -46,7 +46,6 @@ app.post('/api/emails/add', (req, res) => {
     res.status(201).json({ message: 'Email added successfully', email });
 });
 
-// 2. Edit an existing email ID
 app.put('/api/emails/edit', (req, res) => {
     const emails = readData();
     const { oldEmail, newEmail } = req.body;
@@ -61,7 +60,6 @@ app.put('/api/emails/edit', (req, res) => {
     res.json({ message: 'Email updated successfully', oldEmail, newEmail });
 });
 
-// 3. Get all email IDs
 app.get('/api/emails/get', (req, res) => {
     try {
         const emails = readData();
@@ -71,7 +69,6 @@ app.get('/api/emails/get', (req, res) => {
     }
 });
 
-// 4. Remove an email ID
 app.delete('/api/emails/remove', (req, res) => {
     const emails = readData();
     const { email } = req.body;
@@ -86,7 +83,6 @@ app.delete('/api/emails/remove', (req, res) => {
     res.json({ message: 'Email removed successfully', email });
 });
 
-// Start the server
-app.listen(port, () => {
-    console.log(`API running on http://localhost:${port}`);
-});
+// Export the app as a serverless function
+module.exports = app;
+module.exports.handler = serverless(app);
